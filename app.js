@@ -20,29 +20,6 @@ if (process.env.NODE_ENV === 'developement') {
 app.use(express.json());
 app.use(express.static(`public`));
 
-app.get('/debug-check', async (req, res) => {
-  const db = mongoose.connection.db;
-  if (!db) {
-    return res.json({ error: 'DB not connected' });
-  }
-
-  let collections = [];
-  try {
-    collections = await db.listCollections().toArray();
-  } catch (e) {
-    collections = [{ error: 'Cannot list collections' }];
-  }
-
-  let usersData = [];
-  try {
-    usersData = await db.collection('users').find({}).toArray();
-  } catch (e) {
-    usersData = [{ error: 'users collection not found' }];
-  }
-
-  res.json({ collections, usersData });
-});
-
 app.use('/api/sunday-school/users', userRouter);
 
 export default app;
