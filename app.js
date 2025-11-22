@@ -22,14 +22,25 @@ app.use(express.static(`public`));
 
 app.get('/debug-check', async (req, res) => {
   const db = mongoose.connection.db;
-  const collections = await db.listCollections().toArray();
+  if (!db) {
+    return res.json({ error: 'DB not connected' });
+  }
 
-  let data = [];
+  let collections = [];
   try {
-    data = await db.collection('users').find({}).toArray();
-  } catch (e) {}
+    collections = await db.listCollections().toArray();
+  } catch (e) {
+    collections = [{ error: 'Cannot list collections' }];
+  }
 
-  res.json({ collections, usersData: data });
+  let usersData = [];
+  try {
+    usersData = await db.collection('users').find({}).toArray();
+  } catch (e) {
+    usersData = [{ error: 'users collection not found' }];
+  }
+
+  res.json({ collections, usersData });
 });
 
 app.use('/api/sunday-school/users', userRouter);
