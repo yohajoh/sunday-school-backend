@@ -55,7 +55,7 @@ const userSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema, 'users');
 
 // db.users.createIndex({ email: 1 }, { unique: true })
 // db.users.createIndex({ studentId: 1 }, { unique: true })
