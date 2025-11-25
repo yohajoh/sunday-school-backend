@@ -1,6 +1,6 @@
 import User from '../models/userModel.js';
 
-export const getUser = async (req, res) => {
+export const getUser = async (req, res, next) => {
   try {
     const data = await User.find();
     res.status(200).json({
@@ -12,10 +12,11 @@ export const getUser = async (req, res) => {
     });
   } catch (err) {
     console.log('Error:', err.message);
+    next(err);
   }
 };
 
-export const createUser = async (req, res) => {
+export const createUser = async (req, res, next) => {
   try {
     const data = await User.create(req.body);
     res.status(201).json({
@@ -26,5 +27,6 @@ export const createUser = async (req, res) => {
     });
   } catch (err) {
     console.log('Error:', err.message);
+    next(err);
   }
 };
