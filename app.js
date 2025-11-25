@@ -3,6 +3,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 
 import userRouter from './routes/userRoutes.js';
+import assetRouter from './routes/assetRoutes.js';
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(express.json());
 app.use(express.static(`public`));
 
 app.use('/api/sunday-school/users', userRouter);
+app.use('/api/sunday-school/assets', assetRouter);
 
 app.use((err, req, res, next) => {
   let status = 500;

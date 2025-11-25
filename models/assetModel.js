@@ -12,7 +12,7 @@ const assetSchema = new mongoose.Schema({
     enum: ['available', 'assigned', 'maintenance', 'retired'],
     default: 'available',
   },
-  assignedTo: { type: ObjectId, ref: 'User' }, // Reference to User
+  assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Reference to User
 
   // Purchase Information
   purchaseDate: { type: Date, required: true },
