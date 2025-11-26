@@ -4,27 +4,40 @@ import cors from 'cors';
 
 import userRouter from './routes/userRoutes.js';
 import assetRouter from './routes/assetRoutes.js';
+import testRouter from './routes/test_cloudinary.js';
+import uploadRoutes from './routes/upload.js';
+import postRoutes from './routes/posts.js';
+// import { handleMulterError } from './middleware/upload.js';
 
 const app = express();
 
 app.use(
   cors({
     origin: process.env.CLIENT_ORIGIN,
-    // origin: 'http://localhost:3000',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    credentials: true,
   }),
 );
 
-if (process.env.NODE_ENV === 'developement') {
+if (process.env.NODE_ENV === 'development') {
+  // Fixed typo: developement -> development
   app.use(morgan('dev'));
 }
 
-app.use(express.json());
-app.use(express.static(`public`));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.static('public'));
 
 app.use('/api/sunday-school/users', userRouter);
 app.use('/api/sunday-school/assets', assetRouter);
+app.use('/api/sunday-school/test', testRouter);
+app.use('/api/sunday-school/upload', uploadRoutes);
+app.use('/api/sunday-school/posts', postRoutes);
 
+// Add multer error handler
+// app.use(handleMulterError);
+
+// Rest of your error handling middleware...
 app.use((err, req, res, next) => {
   let status = 500;
   let message = 'Server error';
@@ -40,7 +53,6 @@ app.use((err, req, res, next) => {
     status = 409;
     const field = Object.keys(err.keyValue)[0];
 
-    // You want studentId, email, nationalID to return readable messages
     if (field === 'studentId') {
       message = 'Student ID already exists';
     } else if (field === 'email') {
