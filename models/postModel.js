@@ -1,3 +1,4 @@
+// models/postModel.js
 import mongoose from 'mongoose';
 
 const postSchema = new mongoose.Schema(
@@ -32,14 +33,6 @@ const postSchema = new mongoose.Schema(
     publishDate: { type: Date, default: Date.now },
     expiryDate: { type: Date },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    comments: [
-      {
-        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        content: { type: String, required: true },
-        createdAt: { type: Date, default: Date.now },
-      },
-    ],
-    shares: { type: Number, default: 0 },
   },
   {
     timestamps: true,

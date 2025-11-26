@@ -1,6 +1,7 @@
+// routes/posts.js
 import express from 'express';
 import Post from '../models/postModel.js';
-import cloudinary from '../config/cloudinary.js';
+import Comment from '../models/commentModel.js';
 
 const router = express.Router();
 
@@ -9,7 +10,8 @@ router.get('/', async (req, res) => {
   try {
     const posts = await Post.find()
       .populate('authorId', 'firstName lastName')
-      .sort({ createdAt: -1 });
+      .populate('likes', 'firstName lastName')
+      .sort({ isPinned: -1, createdAt: -1 });
 
     res.json({
       success: true,
@@ -24,7 +26,34 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Create post with image data from request body (NO file upload here)
+// Get single post
+router.get('/:id', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id)
+      .populate('authorId', 'firstName lastName')
+      .populate('likes', 'firstName lastName');
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: 'Post not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      data: post,
+    });
+  } catch (error) {
+    console.error('❌ Get post error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching post',
+    });
+  }
+});
+
+// Create post
 router.post('/', async (req, res) => {
   try {
     const {
@@ -38,48 +67,35 @@ router.post('/', async (req, res) => {
       publishDate,
       expiryDate,
       authorId,
-      image, // Image URL from frontend
-      imagePublicId, // Public ID from frontend
-    } = req.body;
-
-    console.log('📝 Creating post with data:', {
-      title,
       image,
       imagePublicId,
-      authorId,
-    });
-
-    // Validate required fields
-    if (!title || !content) {
-      return res.status(400).json({
-        success: false,
-        message: 'Title and content are required',
-      });
-    }
+    } = req.body;
 
     const post = new Post({
       title,
       content,
-      author: 'System Admin', // You can get this from auth middleware
-      authorId: authorId || '65d8f5a8c8e9f4a1b2c3d4e5', // Default or from auth
+      author: 'System Admin',
+      authorId: authorId || '65d8f5a8c8e9f4a1b2c3d4e5',
       category,
       status,
-      image: image || '', // Use the image URL from request body
-      imagePublicId: imagePublicId || '', // Use the publicId from request body
+      image: image || '',
+      imagePublicId: imagePublicId || '',
       tags: Array.isArray(tags) ? tags : tags ? JSON.parse(tags) : [],
       targetAudience,
-      isPinned: isPinned === 'true' || isPinned === true,
+      isPinned: isPinned === 'true',
       publishDate: publishDate || new Date(),
-      expiryDate: expiryDate || null,
+      expiryDate,
     });
 
     await post.save();
 
-    console.log('✅ Post created successfully:', post._id);
+    const populatedPost = await Post.findById(post._id)
+      .populate('authorId', 'firstName lastName')
+      .populate('likes', 'firstName lastName');
 
     res.status(201).json({
       success: true,
-      data: post,
+      data: populatedPost,
     });
   } catch (error) {
     console.error('❌ Create post error:', error);
@@ -90,17 +106,9 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Update post - also accept image data from request body
+// Update post
 router.put('/:id', async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
-    if (!post) {
-      return res.status(404).json({
-        success: false,
-        message: 'Post not found',
-      });
-    }
-
     const {
       title,
       content,
@@ -111,65 +119,36 @@ router.put('/:id', async (req, res) => {
       isPinned,
       publishDate,
       expiryDate,
-      image, // New image URL from frontend
-      imagePublicId, // New public ID from frontend
-    } = req.body;
-
-    console.log('📝 Updating post with data:', {
-      title,
       image,
       imagePublicId,
-    });
+    } = req.body;
 
-    // If new image data is provided, update it (and delete old image from Cloudinary)
-    if (image && imagePublicId) {
-      // Delete old image from Cloudinary if it exists and is different from new one
-      if (post.imagePublicId && post.imagePublicId !== imagePublicId) {
-        try {
-          await cloudinary.uploader.destroy(post.imagePublicId);
-          console.log(
-            '🗑️ Deleted old image from Cloudinary:',
-            post.imagePublicId,
-          );
-        } catch (deleteError) {
-          console.error('❌ Error deleting old image:', deleteError);
-          // Continue with update even if deletion fails
-        }
-      }
+    const post = await Post.findByIdAndUpdate(
+      req.params.id,
+      {
+        title,
+        content,
+        category,
+        status,
+        tags: Array.isArray(tags) ? tags : tags ? JSON.parse(tags) : [],
+        targetAudience,
+        isPinned: isPinned === 'true',
+        publishDate,
+        expiryDate,
+        image: image || '',
+        imagePublicId: imagePublicId || '',
+      },
+      { new: true, runValidators: true },
+    )
+      .populate('authorId', 'firstName lastName')
+      .populate('likes', 'firstName lastName');
 
-      post.image = image;
-      post.imagePublicId = imagePublicId;
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: 'Post not found',
+      });
     }
-
-    // Update other fields
-    const updatableFields = [
-      'title',
-      'content',
-      'category',
-      'status',
-      'tags',
-      'targetAudience',
-      'isPinned',
-      'publishDate',
-      'expiryDate',
-    ];
-
-    updatableFields.forEach((field) => {
-      if (req.body[field] !== undefined) {
-        if (field === 'tags') {
-          post[field] = Array.isArray(req.body[field])
-            ? req.body[field]
-            : JSON.parse(req.body[field]);
-        } else if (field === 'isPinned') {
-          post[field] = req.body[field] === 'true' || req.body[field] === true;
-        } else {
-          post[field] = req.body[field];
-        }
-      }
-    });
-
-    post.updatedAt = new Date();
-    await post.save();
 
     res.json({
       success: true,
@@ -195,16 +174,8 @@ router.delete('/:id', async (req, res) => {
       });
     }
 
-    // Delete image from Cloudinary
-    if (post.imagePublicId) {
-      try {
-        await cloudinary.uploader.destroy(post.imagePublicId);
-        console.log('🗑️ Deleted image from Cloudinary:', post.imagePublicId);
-      } catch (deleteError) {
-        console.error('❌ Error deleting image from Cloudinary:', deleteError);
-        // Continue with post deletion even if image deletion fails
-      }
-    }
+    // Delete all comments associated with this post
+    await Comment.deleteMany({ postId: req.params.id });
 
     await Post.findByIdAndDelete(req.params.id);
 
@@ -217,6 +188,55 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error deleting post: ' + error.message,
+    });
+  }
+});
+
+// Like a post
+router.post('/:id/like', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const postId = req.params.id;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID is required',
+      });
+    }
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: 'Post not found',
+      });
+    }
+
+    const alreadyLiked = post.likes.includes(userId);
+
+    if (alreadyLiked) {
+      post.likes = post.likes.filter((like) => like.toString() !== userId);
+    } else {
+      post.likes.push(userId);
+    }
+
+    await post.save();
+
+    const updatedPost = await Post.findById(postId)
+      .populate('authorId', 'firstName lastName')
+      .populate('likes', 'firstName lastName');
+
+    res.json({
+      success: true,
+      data: updatedPost,
+      message: alreadyLiked ? 'Post unliked' : 'Post liked',
+    });
+  } catch (error) {
+    console.error('❌ Like post error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error liking post: ' + error.message,
     });
   }
 });
