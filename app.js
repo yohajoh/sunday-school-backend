@@ -9,13 +9,16 @@ import assetRouter from './routes/assetRoutes.js';
 import uploadRoutes from './routes/upload.js';
 import postRoutes from './routes/posts.js';
 import commentRoutes from './routes/comments.js';
+// In your server setup
+import galleryRoutes from './routes/gallery.js';
+import userGalleryRoutes from './routes/userGallery.js';
 
 const app = express();
 
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN,
-    // origin: 'http://localhost:3000',
+    // origin: process.env.CLIENT_ORIGIN,
+    origin: 'http://localhost:3000',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   }),
 );
@@ -33,6 +36,8 @@ app.use('/api/sunday-school/assets', assetRouter);
 app.use('/api/sunday-school/upload', uploadRoutes);
 app.use('/api/sunday-school/posts', postRoutes);
 app.use('/api/sunday-school/comments', commentRoutes);
+app.use('/api/sunday-school/admin/gallery', galleryRoutes);
+app.use('/api/sunday-school/user/gallery', userGalleryRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
