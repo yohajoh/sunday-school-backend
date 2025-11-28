@@ -17,22 +17,14 @@ import userGalleryRoutes from './routes/userGallery.js';
 const app = express();
 
 // CRITICAL: Configure trust proxy FIRST
-app.set('trust proxy', 1);
+// app.set('trust proxy', 1);
 
 // Enhanced CORS configuration
 app.use(
   cors({
     origin: process.env.CLIENT_ORIGIN,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'Cookie',
-      'X-Requested-With',
-      'Accept',
-      'Origin',
-    ],
-    exposedHeaders: ['Set-Cookie'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
   }),
 );
 
