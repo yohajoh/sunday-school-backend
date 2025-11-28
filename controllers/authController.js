@@ -40,27 +40,25 @@ export const register = async (req, res, next) => {
     // 3. Generate JWT token
     const token = user.generateAuthToken();
 
-    // 4. Set JWT as HTTP-only cookie - FIXED FOR CROSS-ORIGIN
+    // 4. Set JWT as HTTP-only cookie
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none', // Changed from 'strict' to 'none' for cross-origin
+      secure: true, // Always true for Render
+      sameSite: 'none', // Required for cross-origin
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain:
-        process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined, // Allow subdomains
     });
 
     // 5. Remove password from output
     user.password = undefined;
 
-    // 6. Send response
+    // 6. Send response WITH token
     res.status(201).json({
       status: 'success',
       message: 'User registered successfully',
       data: {
         user,
+        token, // Send token in response too
       },
-      token,
     });
   } catch (error) {
     console.log('Registration Error:', error.message);
@@ -101,27 +99,25 @@ export const login = async (req, res, next) => {
     // 5. Generate JWT token
     const token = user.generateAuthToken();
 
-    // 6. Set JWT as HTTP-only cookie - FIXED FOR CROSS-ORIGIN
+    // 6. Set JWT as HTTP-only cookie
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none', // Changed from 'strict' to 'none' for cross-origin
+      secure: true, // Always true for Render
+      sameSite: 'none', // Required for cross-origin
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain:
-        process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined, // Allow subdomains
     });
 
     // 7. Remove password from output
     user.password = undefined;
 
-    // 8. Send response
+    // 8. Send response WITH token
     res.status(200).json({
       status: 'success',
       message: 'Login successful',
       data: {
         user,
+        token, // Send token in response too
       },
-      token,
     });
   } catch (error) {
     console.log('Login Error:', error.message);
@@ -135,8 +131,7 @@ export const logout = (req, res) => {
     httpOnly: true,
     expires: new Date(0),
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'none', // Changed from 'strict' to 'none'
-    domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
+    sameSite: 'strict',
   });
 
   res.status(200).json({
@@ -252,14 +247,12 @@ export const changePassword = async (req, res, next) => {
     // 4. Generate new token
     const token = user.generateAuthToken();
 
-    // 5. Update cookie with new token - FIXED FOR CROSS-ORIGIN
+    // 5. Update cookie with new token
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none', // Changed from 'strict' to 'none'
+      sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain:
-        process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
     });
 
     res.status(200).json({
