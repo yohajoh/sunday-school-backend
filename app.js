@@ -1,4 +1,4 @@
-// app.js
+// app.js - UPDATED CORS AND COOKIE CONFIG
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
@@ -11,19 +11,29 @@ import assetRoutes from './routes/assetRoutes.js';
 import uploadRoutes from './routes/upload.js';
 import postRoutes from './routes/posts.js';
 import commentRoutes from './routes/comments.js';
-// In your server setup
 import galleryRoutes from './routes/gallery.js';
 import userGalleryRoutes from './routes/userGallery.js';
 
 const app = express();
 
+// CRITICAL: Configure trust proxy FIRST
+app.set('trust proxy', 1);
+
+// Enhanced CORS configuration
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN,
-    // origin: 'http://localhost:3000', // Your frontend URL
-    credentials: true, // This is crucial for cookies
+    origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000',
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Cookie',
+      'X-Requested-With',
+      'Accept',
+      'Origin',
+    ],
+    exposedHeaders: ['Set-Cookie'],
   }),
 );
 

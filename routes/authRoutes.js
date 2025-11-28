@@ -18,8 +18,8 @@ router.post('/login', login);
 router.post('/logout', logout);
 
 // ==================== PROTECTED ROUTES ====================
-router.use(protect);
 
+router.use(protect);
 router.get('/me', getMe);
 router.patch('/update-me', updateMe);
 router.patch('/change-password', changePassword);

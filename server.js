@@ -6,8 +6,8 @@ dotenv.config({ path: './config.env' });
 import app from './app.js';
 
 mongoose
-  .connect(process.env.MONGO_URL, {
-    // .connect(process.env.DATABASE_LOCAL, {
+  // .connect(process.env.MONGO_URL, {
+  .connect(process.env.DATABASE_LOCAL, {
     dbName: 'sunday-school',
   })
   .then(() => console.log('DB connection successfull!'));
