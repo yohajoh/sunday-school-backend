@@ -40,12 +40,14 @@ export const register = async (req, res, next) => {
     // 3. Generate JWT token
     const token = user.generateAuthToken();
 
-    // 4. Set JWT as HTTP-only cookie
+    // 4. Set JWT as HTTP-only cookie - FIXED FOR CROSS-ORIGIN
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'none', // Changed from 'strict' to 'none' for cross-origin
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      domain:
+        process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined, // Allow subdomains
     });
 
     // 5. Remove password from output
@@ -99,12 +101,14 @@ export const login = async (req, res, next) => {
     // 5. Generate JWT token
     const token = user.generateAuthToken();
 
-    // 6. Set JWT as HTTP-only cookie
+    // 6. Set JWT as HTTP-only cookie - FIXED FOR CROSS-ORIGIN
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'none', // Changed from 'strict' to 'none' for cross-origin
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      domain:
+        process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined, // Allow subdomains
     });
 
     // 7. Remove password from output
@@ -131,7 +135,8 @@ export const logout = (req, res) => {
     httpOnly: true,
     expires: new Date(0),
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: 'none', // Changed from 'strict' to 'none'
+    domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
   });
 
   res.status(200).json({
@@ -247,12 +252,14 @@ export const changePassword = async (req, res, next) => {
     // 4. Generate new token
     const token = user.generateAuthToken();
 
-    // 5. Update cookie with new token
+    // 5. Update cookie with new token - FIXED FOR CROSS-ORIGIN
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'none', // Changed from 'strict' to 'none'
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      domain:
+        process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
     });
 
     res.status(200).json({
