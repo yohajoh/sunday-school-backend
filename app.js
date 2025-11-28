@@ -22,8 +22,7 @@ app.set('trust proxy', 1);
 // Enhanced CORS configuration
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000',
-    credentials: true,
+    origin: process.env.CLIENT_ORIGIN,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
       'Content-Type',
