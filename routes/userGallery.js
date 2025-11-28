@@ -1,7 +1,10 @@
 import express from 'express';
 import Gallery from '../models/gallery.js';
+import {protect} from '../middleware/auth.js'
 
 const router = express.Router();
+
+router.use(protect)
 
 // Get published galleries for users WITHOUT PAGINATION
 router.get('/', async (req, res) => {

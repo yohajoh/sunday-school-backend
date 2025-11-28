@@ -1,8 +1,9 @@
+// controllers/userController.js
 import User from '../models/userModel.js';
 
 export const getUser = async (req, res, next) => {
   try {
-    const data = await User.find({});
+    const data = await User.find();
     res.status(200).json({
       status: 'success',
       results: data.length,
@@ -44,7 +45,7 @@ export const updateUser = async (req, res, next) => {
     if (!data) {
       return res.status(404).json({
         success: false,
-        message: 'Asset not found',
+        message: 'User not found',
       });
     }
 
@@ -67,7 +68,7 @@ export const deleteUser = async (req, res, next) => {
     if (!deleted) {
       return res.status(404).json({
         success: false,
-        message: 'Asset not found',
+        message: 'User not found',
       });
     }
 

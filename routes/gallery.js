@@ -2,9 +2,12 @@ import express from 'express';
 import Gallery from '../models/gallery.js';
 import cloudinary from '../config/cloudinary.js';
 import upload from '../middleware/upload.js';
+import { protect } from '../middleware/auth.js';
 // import { protect, admin } from '../middleware/auth.js';
 
 const router = express.Router();
+
+router.use(protect);
 
 // Get all galleries WITHOUT pagination
 router.get('/', async (req, res) => {

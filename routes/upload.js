@@ -1,8 +1,11 @@
 import express from 'express';
 import cloudinary from '../config/cloudinary.js';
 import upload from '../middleware/upload.js';
+import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
+
+router.use(protect);
 
 // Upload single image - FIXED VERSION
 router.post('/image', upload.single('image'), async (req, res) => {

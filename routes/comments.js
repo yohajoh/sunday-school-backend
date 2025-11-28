@@ -1,8 +1,11 @@
 // routes/comments.js
 import express from 'express';
 import Comment from '../models/commentModel.js';
+import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
+
+router.use(protect);
 
 // Get all comments for a post
 router.get('/post/:postId', async (req, res) => {

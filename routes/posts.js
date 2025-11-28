@@ -2,8 +2,11 @@
 import express from 'express';
 import Post from '../models/postModel.js';
 import Comment from '../models/commentModel.js';
+import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
+
+router.use(protect);
 
 // Get all posts
 router.get('/', async (req, res) => {

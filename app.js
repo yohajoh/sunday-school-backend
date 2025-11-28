@@ -2,10 +2,12 @@
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 // Import routes
-import userRouter from './routes/userRoutes.js';
-import assetRouter from './routes/assetRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import assetRoutes from './routes/assetRoutes.js';
 import uploadRoutes from './routes/upload.js';
 import postRoutes from './routes/posts.js';
 import commentRoutes from './routes/comments.js';
@@ -18,8 +20,10 @@ const app = express();
 app.use(
   cors({
     origin: process.env.CLIENT_ORIGIN,
-    // origin: 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    // origin: 'http://localhost:3000', // Your frontend URL
+    credentials: true, // This is crucial for cookies
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
   }),
 );
 
@@ -27,12 +31,14 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.static('public'));
 
 // Use routes
-app.use('/api/sunday-school/users', userRouter);
-app.use('/api/sunday-school/assets', assetRouter);
+app.use('/api/sunday-school/users', userRoutes);
+app.use('/api/sunday-school/auth', authRoutes);
+app.use('/api/sunday-school/assets', assetRoutes);
 app.use('/api/sunday-school/upload', uploadRoutes);
 app.use('/api/sunday-school/posts', postRoutes);
 app.use('/api/sunday-school/comments', commentRoutes);

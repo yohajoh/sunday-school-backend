@@ -1,3 +1,4 @@
+// routes/userRoutes.js
 import express from 'express';
 import {
   getUser,
@@ -5,10 +6,19 @@ import {
   updateUser,
   deleteUser,
 } from '../controllers/userController.js';
+import { protect, restrictTo } from '../middleware/auth.js';
 
-const userRouter = express.Router();
+const router = express.Router();
 
-userRouter.route('/').get(getUser).post(createUser);
-userRouter.route('/:id').put(updateUser).delete(deleteUser);
+// Protect all routes - only logged-in users can access
 
-export default userRouter;
+router.use(protect);
+// Restrict to admin only for user management
+router.use(restrictTo('admin'));
+
+router.get('/', getUser);
+router.post('/', createUser);
+router.put('/:id', updateUser);
+router.delete('/:id', deleteUser);
+
+export default router;
