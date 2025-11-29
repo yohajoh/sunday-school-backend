@@ -1,3 +1,5 @@
+import cloudinary from 'cloudinary';
+
 // Upload single image - FIXED VERSION
 export const uploadImage = async (req, res) => {
   try {
