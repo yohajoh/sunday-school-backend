@@ -1,3 +1,5 @@
+import Comment from '../models/commentModel';
+
 export const getComment = async (req, res) => {
   try {
     const comments = await Comment.find({ postId: req.params.postId })
