@@ -1,4 +1,5 @@
 import Gallery from '../models/gallery.js';
+import cloudinary from 'cloudinary';
 
 // Get all galleries WITHOUT pagination
 export const getGalleries = async (req, res) => {
