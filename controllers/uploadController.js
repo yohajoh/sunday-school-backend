@@ -1,14 +1,5 @@
-import express from 'express';
-import cloudinary from '../config/cloudinary.js';
-import upload from '../middleware/upload.js';
-import { protect } from '../middleware/auth.js';
-
-const router = express.Router();
-
-router.use(protect);
-
 // Upload single image - FIXED VERSION
-router.post('/image', upload.single('image'), async (req, res) => {
+export const uploadImage = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({
@@ -52,10 +43,10 @@ router.post('/image', upload.single('image'), async (req, res) => {
       message: 'Error uploading image: ' + error.message,
     });
   }
-});
+};
 
 // Upload multiple images - FIXED VERSION
-router.post('/images', upload.array('images', 10), async (req, res) => {
+export const uploadImages = async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({
@@ -99,10 +90,10 @@ router.post('/images', upload.array('images', 10), async (req, res) => {
       message: 'Error uploading images: ' + error.message,
     });
   }
-});
+};
 
 // Delete image - IMPROVED VERSION
-router.delete('/image/:publicId', async (req, res) => {
+export const deleteImage = async (req, res) => {
   try {
     const { publicId } = req.params;
 
@@ -140,6 +131,4 @@ router.delete('/image/:publicId', async (req, res) => {
       message: 'Error deleting image: ' + error.message,
     });
   }
-});
-
-export default router;
+};

@@ -1,13 +1,7 @@
-import express from 'express';
 import Gallery from '../models/gallery.js';
-import {protect} from '../middleware/auth.js'
-
-const router = express.Router();
-
-router.use(protect)
 
 // Get published galleries for users WITHOUT PAGINATION
-router.get('/', async (req, res) => {
+export const getGalleries = async (req, res) => {
   try {
     const category = req.query.category;
     const search = req.query.search;
@@ -46,10 +40,10 @@ router.get('/', async (req, res) => {
       message: 'Error fetching galleries',
     });
   }
-});
+};
 
 // Get user gallery categories - FIXED VERSION
-router.get('/categories', async (req, res) => {
+export const getCatagories = async (req, res) => {
   try {
     console.log('🔍 Fetching user gallery categories...');
 
@@ -79,10 +73,10 @@ router.get('/categories', async (req, res) => {
       message: 'Error fetching categories: ' + error.message,
     });
   }
-});
+};
 
 // Get single gallery image
-router.get('/:id', async (req, res) => {
+export const getGallery = async (req, res) => {
   try {
     const gallery = await Gallery.findOne({
       _id: req.params.id,
@@ -107,6 +101,4 @@ router.get('/:id', async (req, res) => {
       message: 'Error fetching gallery image',
     });
   }
-});
-
-export default router;
+};

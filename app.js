@@ -8,11 +8,11 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import assetRoutes from './routes/assetRoutes.js';
-import uploadRoutes from './routes/upload.js';
-import postRoutes from './routes/posts.js';
-import commentRoutes from './routes/comments.js';
-import galleryRoutes from './routes/gallery.js';
-import userGalleryRoutes from './routes/userGallery.js';
+import uploadRoutes from './routes/uploadRoutes.js';
+import postRoutes from './routes/postRoutes.js';
+import commentRoutes from './routes/commentRoutes.js';
+import adminGalleryRoutes from './routes/adminGalleryRoutes.js';
+import userGalleryRoutes from './routes/userGalleryRoutes.js';
 
 const app = express();
 
@@ -45,7 +45,7 @@ app.use('/api/sunday-school/assets', assetRoutes);
 app.use('/api/sunday-school/upload', uploadRoutes);
 app.use('/api/sunday-school/posts', postRoutes);
 app.use('/api/sunday-school/comments', commentRoutes);
-app.use('/api/sunday-school/admin/gallery', galleryRoutes);
+app.use('/api/sunday-school/admin/gallery', adminGalleryRoutes);
 app.use('/api/sunday-school/user/gallery', userGalleryRoutes);
 
 // Error handling middleware

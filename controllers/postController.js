@@ -1,15 +1,8 @@
-// routes/posts.js
-import express from 'express';
 import Post from '../models/postModel.js';
 import Comment from '../models/commentModel.js';
-import { protect } from '../middleware/auth.js';
-
-const router = express.Router();
-
-router.use(protect);
 
 // Get all posts
-router.get('/', async (req, res) => {
+export const getPosts = async (req, res) => {
   try {
     const posts = await Post.find()
       .populate('authorId', 'firstName lastName')
@@ -27,10 +20,10 @@ router.get('/', async (req, res) => {
       message: 'Error fetching posts',
     });
   }
-});
+};
 
 // Get single post
-router.get('/:id', async (req, res) => {
+export const getPost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id)
       .populate('authorId', 'firstName lastName')
@@ -54,14 +47,15 @@ router.get('/:id', async (req, res) => {
       message: 'Error fetching post',
     });
   }
-});
+};
 
 // Create post
-router.post('/', async (req, res) => {
+export const createPost = async (req, res) => {
   try {
     const {
       title,
       content,
+      author,
       category,
       status,
       tags,
@@ -77,7 +71,7 @@ router.post('/', async (req, res) => {
     const post = new Post({
       title,
       content,
-      author: 'System Admin',
+      author,
       authorId: authorId || '65d8f5a8c8e9f4a1b2c3d4e5',
       category,
       status,
@@ -107,10 +101,10 @@ router.post('/', async (req, res) => {
       message: 'Error creating post: ' + error.message,
     });
   }
-});
+};
 
 // Update post
-router.put('/:id', async (req, res) => {
+export const updatePost = async (req, res) => {
   try {
     const {
       title,
@@ -164,10 +158,10 @@ router.put('/:id', async (req, res) => {
       message: 'Error updating post: ' + error.message,
     });
   }
-});
+};
 
 // Delete post
-router.delete('/:id', async (req, res) => {
+export const deletePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (!post) {
@@ -193,10 +187,10 @@ router.delete('/:id', async (req, res) => {
       message: 'Error deleting post: ' + error.message,
     });
   }
-});
+};
 
 // Like a post
-router.post('/:id/like', async (req, res) => {
+export const likePost = async (req, res) => {
   try {
     const { userId } = req.body;
     const postId = req.params.id;
@@ -242,6 +236,4 @@ router.post('/:id/like', async (req, res) => {
       message: 'Error liking post: ' + error.message,
     });
   }
-});
-
-export default router;
+};

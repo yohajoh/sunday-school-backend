@@ -1,14 +1,4 @@
-// routes/comments.js
-import express from 'express';
-import Comment from '../models/commentModel.js';
-import { protect } from '../middleware/auth.js';
-
-const router = express.Router();
-
-router.use(protect);
-
-// Get all comments for a post
-router.get('/post/:postId', async (req, res) => {
+export const getComment = async (req, res) => {
   try {
     const comments = await Comment.find({ postId: req.params.postId })
       .populate('authorId', 'firstName lastName')
@@ -25,10 +15,9 @@ router.get('/post/:postId', async (req, res) => {
       message: 'Error fetching comments',
     });
   }
-});
+};
 
-// Create new comment
-router.post('/', async (req, res) => {
+export const createNewComment = async (req, res) => {
   try {
     const { postId, author, authorId, text, parentId } = req.body;
 
@@ -66,10 +55,9 @@ router.post('/', async (req, res) => {
       message: 'Error creating comment: ' + error.message,
     });
   }
-});
+};
 
-// Like a comment
-router.post('/:id/like', async (req, res) => {
+export const likeComment = async (req, res) => {
   try {
     const { userId } = req.body;
 
@@ -110,6 +98,4 @@ router.post('/:id/like', async (req, res) => {
       message: 'Error liking comment: ' + error.message,
     });
   }
-});
-
-export default router;
+};
